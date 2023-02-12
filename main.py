@@ -1,8 +1,12 @@
 import telebot
 from telebot import types
+import requests
 
 
 bot = telebot.TeleBot('6013566509:AAFbarNxSocCg__ga225XCYj_fPiaHaIYc8')
+chat_id = "-1001770638270"
+information = ''
+bot_api = "6013566509:AAFbarNxSocCg__ga225XCYj_fPiaHaIYc8"
 name = ''
 university = ''
 subject = ''
@@ -39,6 +43,7 @@ def step3(message): # Name Parse
 
 def step4(message):
     global purpose
+    global information
 
     while purpose == 'None' :  # проверяем что возраст изменился
         try:
@@ -52,6 +57,7 @@ def step4(message):
         key_no = types.InlineKeyboardButton(text='Нет', callback_data='no')
         keyboard.add(key_no)
         question = 'Тебя зовут '+name+' ты из ' + university + '.' + ' Твой вопрос '+purpose+' По '+subject+'?'
+        information = f"Имя:{name}\nУниверситет:{university}\nПредмет:{subject}\nВопрос:{purpose}"
         bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
 
 
@@ -59,8 +65,11 @@ def step4(message):
 def callback_worker(call):
     if call.data == "yes":  # call.data это callback_data, которую мы указали при объявлении кнопки
         bot.send_message(call.message.chat.id, 'Ваш запрос принят, ожидайте ответа.')
+        message = "hello from your telegram bot"
+        url = f"https://api.telegram.org/bot{bot_api}/sendMessage?chat_id={chat_id}&text={information}"
+        print(requests.get(url).json())  # this sends the message
     elif call.data == "no":
-         ...
+         ... # todo
 
 
 
