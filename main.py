@@ -58,6 +58,7 @@ def step4(message):
         keyboard.add(key_no)
         question = 'Тебя зовут '+name+' ты из ' + university + '.' + ' Твой вопрос '+purpose+' По '+subject+'?'
         information = f"Имя:{name}\nУниверситет:{university}\nПредмет:{subject}\nВопрос:{purpose}"
+        user = message.from_user.username
         bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
 
 
@@ -65,11 +66,20 @@ def step4(message):
 def callback_worker(call):
     if call.data == "yes":  # call.data это callback_data, которую мы указали при объявлении кнопки
         bot.send_message(call.message.chat.id, 'Ваш запрос принят, ожидайте ответа.')
-        message = "hello from your telegram bot"
         url = f"https://api.telegram.org/bot{bot_api}/sendMessage?chat_id={chat_id}&text={information}"
-        print(requests.get(url).json())  # this sends the message
+        keyboard_r = types.InlineKeyboardMarkup()  # наша клавиатура
+        key_yes_r = types.InlineKeyboardButton(text='Да', callback_data='yes')  # кнопка «Да»
+        keyboard_r.add(key_yes_r)
+        call.message.chat.id = chat_id
+        # print(requests.get(url).json())
+        bot.send_message(call.message.chat.id, text=information, reply_markup=keyboard_r)
+        # this sends the message
     elif call.data == "no":
          ... # todo
+# @bot.callback_query_handler(func = lambda response:True)
+
+
+
 
 
 
