@@ -63,20 +63,17 @@ def step4(message):
 
 
 @bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call):
-    if call.data == "yes":  # call.data это callback_data, которую мы указали при объявлении кнопки
-        bot.send_message(call.message.chat.id, 'Ваш запрос принят, ожидайте ответа.')
-        url = f"https://api.telegram.org/bot{bot_api}/sendMessage?chat_id={chat_id}&text={information}"
-        keyboard_r = types.InlineKeyboardMarkup()  # наша клавиатура
-        key_yes_r = types.InlineKeyboardButton(text='Да', callback_data='yes')  # кнопка «Да»
-        keyboard_r.add(key_yes_r)
-        call.message.chat.id = chat_id
-        # print(requests.get(url).json())
-        bot.send_message(call.message.chat.id, text=information, reply_markup=keyboard_r)
-        # this sends the message
-    elif call.data == "no":
-         ... # todo
-# @bot.callback_query_handler(func = lambda response:True)
+def callback_function1(callback_obj: telebot.types.CallbackQuery):
+    if callback_obj.data == "yes":
+        bot.send_message(callback_obj.from_user.id, "Вы нажали на кнопку подтверждения. Ждите ответа от преподователя.")
+        keyboard = telebot.types.InlineKeyboardMarkup()
+        key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes')
+        keyboard.add(key_yes)
+        bot.send_message(chat_id, text=information, reply_markup=keyboard)
+    else:
+        bot.send_message(callback_obj.from_user.id, "Перезапустите бота и попытайтесь снова")
+    bot.answer_callback_query(callback_query_id=callback_obj.id)
+
 
 
 
