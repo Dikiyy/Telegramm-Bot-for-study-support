@@ -11,4 +11,6 @@ What are the benefits of using such a bot:
   4)No databases/files to store the data, full anonimity, If teacher accepts the order, Student will have @username of Teacher and vice versa.
   this preventing to clean the DB, restart bot and etc.(manual work), that means that u can start the bot and forget about it :), while it's helping all the users if it.
   5)It's open for all telegramm users, so we are not centralizing in Prague only, it can be used in many other countires(#todo language choose, teacher groups of countries)
+  
+  pip install -r requirements.txt
    
