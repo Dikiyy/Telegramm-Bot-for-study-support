@@ -16,7 +16,6 @@ text_message_confirmed = 0
 
 
 @bot.message_handler(content_types=['text'])
-
 def get_text_messages(message):
     if message.text == "/start":
         bot.send_message(message.from_user.id, "Начинаем...")
@@ -36,6 +35,7 @@ def step1(message):  # Name Parse
 
 # ________________________________________________________________________
 
+
 @bot.callback_query_handler(func=lambda message: message == True)
 def step2(message):  # Name Parse
     global university
@@ -43,12 +43,14 @@ def step2(message):  # Name Parse
     bot.send_message(message.from_user.id, 'С каким предметом тебе нужна помощь?')
     bot.register_next_step_handler(message, step3)
 
+
 @bot.callback_query_handler(func=lambda message: message == True)
 def step3(message):  # Name Parse
     global subject
     subject = message.text
     bot.send_message(message.from_user.id, 'Сформулируйте свой вопрос.')
     bot.register_next_step_handler(message, step4)
+
 
 @bot.callback_query_handler(func=lambda message: message == True)
 def step4(message):
@@ -71,7 +73,8 @@ def step4(message):
 @bot.callback_query_handler(func=lambda call: call.data == 'yes')
 def callback_function1(callback_obj: telebot.types.CallbackQuery):
     global text_message_confirmed
-    bot.send_message(callback_obj.from_user.id, f"Вы нажали на кнопку подтверждения\U0001F680. Ждите ответа от преподователя\U000023F3.")
+    bot.send_message(callback_obj.from_user.id, f"Вы нажали на кнопку подтверждения\U0001F680. "
+                                                f"Ждите ответа от преподователя\U000023F3.")
     global customer_id
     customer_id = callback_obj.from_user.id
     keyboard = telebot.types.InlineKeyboardMarkup()
@@ -92,12 +95,14 @@ def callback_function1(callback_obj: telebot.types.CallbackQuery):
     key_yes = types.InlineKeyboardButton(text='Создать еще один запрос', callback_data='create_old_new')
     keyboard.add(key_yes)
     bot.send_message(customer_id,
-                     f"{callback_obj.message.html_text}\nВаш заказ был взят нашим специалистом\U0001F973\nКонтакт специалиста"
+                     f"{callback_obj.message.html_text}\nВаш заказ был взят нашим специалистом\U0001F973\n"
+                     f"Контакт специалиста"
                      f"\U0001F4F2 :@"
                      f"{callback_obj.from_user.username}",
                      reply_markup=keyboard)
 
-    bot.send_message(chat_id, text=f"{callback_obj.message.html_text}\nДанный заказ был взят пользователем\U0001F60E\n @"
+    bot.send_message(chat_id, text=f"{callback_obj.message.html_text}\nДанный заказ был взят пользователем"
+                                   f"\U0001F60E\n @"
                                    f"{callback_obj.from_user.username}")
     bot.delete_message(chat_id, callback_obj.message.id)
 
@@ -105,7 +110,6 @@ def callback_function1(callback_obj: telebot.types.CallbackQuery):
 @bot.callback_query_handler(func=lambda call: call.data == 'create_old_new')
 def callback_function1(callback_obj: telebot.types.CallbackQuery):
     bot.send_message(callback_obj.from_user.id, "Для создания нового запроса \U0001F503, отправьте /start")
-
 
 
 bot.polling(none_stop=True, interval=0)
