@@ -15,7 +15,8 @@
         "new_request_created": "A new request has been created.",
         "contact_teacher": "Contact the teacher:\n @{teacher_id}",
         "booked_order": "This order have been taken by:\n@{teacher_id}",
-        "new_order": "Create a new order"
+        "new_order": "Create a new order",
+        "restart_message": "For new order, please restart the bot.\nType or press:/start"
     },
     "ru": {
         "start": "Привет! Как вас зовут?",

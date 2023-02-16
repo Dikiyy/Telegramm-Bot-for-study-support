@@ -25,7 +25,7 @@ def get_translation(language, key, filepath):
 
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(content_types=['text', 'photo'])
 def get_text_messages(message):
     if message.text == "/start":
         bot.send_message(message.from_user.id, "Starting...")
@@ -129,7 +129,8 @@ def callback_function1(callback_obj: telebot.types.CallbackQuery):
 @bot.callback_query_handler(func=lambda call: call.data == 'confirm')
 def callback_function1(callback_obj: telebot.types.CallbackQuery):
     keyboard = telebot.types.InlineKeyboardMarkup()
-    key_yes = types.InlineKeyboardButton(text='Создать еще один запрос', callback_data='create_old_new')
+    key_yes = types.InlineKeyboardButton(text=get_translation(user_language, 'new_order', filepath),
+                                         callback_data='create_old_new')
     keyboard.add(key_yes)
     bot.send_message(customer_id,
                      text=f"{question}\n{get_translation(user_language, 'contact_teacher', filepath).format(teacher_id=callback_obj.from_user.username)}", # noqa
@@ -141,7 +142,7 @@ def callback_function1(callback_obj: telebot.types.CallbackQuery):
 
 @bot.callback_query_handler(func=lambda call: call.data == 'create_old_new')
 def callback_function1(callback_obj: telebot.types.CallbackQuery):
-    bot.send_message(callback_obj.from_user.id, "Для создания нового запроса \U0001F503, отправьте /start")
+    bot.send_message(callback_obj.from_user.id, text='Click /start')
 
 
 bot.polling(none_stop=True, interval=0)
