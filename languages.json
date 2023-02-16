@@ -1,0 +1,48 @@
+{
+    "en": {
+        "start": "Hello! What's your name?☺",
+        "university": "What university do you study at?",
+        "subject": "What subject do you need help with?",
+        "purpose": "What is the purpose of your request?",
+        "information_template": "Name:{name}\nUniversity:{university}\nSubject{subject}\nQuestion is:\n{purpose}",
+        "confirm_message_to_user": "To sum up, your name is{name} \nYou are studying {subject} in {university}, and your question is: \n {purpose}",
+        "confirm": "You pressed the confirmation button 🚀. Please wait for the teacher's response ⏳.",
+        "create_new_request": "To create a new request ...",
+        "request_created": "Your request has been created. Please double-check the information below:",
+        "request_confirmation": "Is this information correct?",
+        "yes": "\\U00002705 Yes",
+        "no": "\\U0000274C No",
+        "new_request_created": "A new request has been created.",
+        "contact_teacher": "Contact the teacher:\n @{teacher_id}",
+        "booked_order": "This order have been taken by:\n@{teacher_id}",
+        "new_order": "Create a new order"
+    },
+    "ru": {
+        "start": "Привет! Как вас зовут?",
+        "university": "В каком вы университете учитесь?",
+        "subject": "Какой предмет вам нужен?",
+        "purpose": "Какая цель вашего запроса?",
+        "confirm": "Вы нажали на кнопку подтверждения 🚀. Ожидайте ответа от преподавателя ⏳.",
+        "create_new_request": "Для создания нового запроса \\U0001F503...",
+        "request_created": "Ваш запрос создан, проверьте информацию еще раз:",
+        "request_confirmation": "Эта информация верна?",
+        "yes": "\\U00002705 Да",
+        "no": "\\U0000274C Нет",
+        "new_request_created": "Новый запрос создан.",
+        "contact_teacher": "Связаться с преподавателем: @{}"
+    },
+    "cz": {
+        "start": "Ahoj! Jak se jmenuješ?",
+        "university": "Na jaké univerzitě studuješ?",
+        "subject": "Jaký předmět potřebuješ?",
+        "purpose": "Jaký je účel tvé žádosti?",
+        "confirm": "Stiskl/a jsi tlačítko potvrzení 🚀. Prosím čekej na odpověď od učitele/ky ⏳.",
+        "create_new_request": "Pro vytvoření nové žádosti \\U0001F503...",
+        "request_created": "Tvá žádost byla vytvořena. Prosím zkontroluj informace níže:",
+        "request_confirmation": "Jsou tyto informace správné?",
+        "yes": "\\U00002705 Ano",
+        "no": "\\U0000274C Ne",
+        "new_request_created": "Byla vytvořena nová žádost.",
+        "contact_teacher": "Kontaktovat učitele/ku: @{}"
+    }
+}

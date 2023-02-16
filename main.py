@@ -1,3 +1,4 @@
+import json
 import telebot
 from telebot import types
 
@@ -13,15 +14,40 @@ purpose = 'None'
 object_message = ''
 customer_id = 0
 text_message_confirmed = 0
+user_language = ''
+filepath = 'languages.json'
+
+
+def get_translation(language, key, filepath):
+    with open(filepath, 'r', encoding='utf-8') as file:
+        translations = json.load(file)
+    return translations.get(language, {}).get(key, f"No translation found for language '{language}' and key '{key}'")
+
 
 
 @bot.message_handler(content_types=['text'])
 def get_text_messages(message):
     if message.text == "/start":
-        bot.send_message(message.from_user.id, "Начинаем...")
-        bot.send_message(message.from_user.id, 'Как тебя зовут?')
+        bot.send_message(message.from_user.id, "Starting...")
+
+        keyboard = types.InlineKeyboardMarkup()  # наша клавиатура
+        key_en = types.InlineKeyboardButton(text='English', callback_data='en')  # кнопка «Да»
+        keyboard.add(key_en)  # добавляем кнопку в клавиатуру
+        key_ru = types.InlineKeyboardButton(text='Russian', callback_data='ru')
+        keyboard.add(key_ru)
+        key_ru = types.InlineKeyboardButton(text='Czech', callback_data='cz')
+        keyboard.add(key_ru)
+        key_ru = types.InlineKeyboardButton(text='Italian', callback_data='it')
+        keyboard.add(key_ru)
+        bot.send_message(message.from_user.id, 'Choose a language', reply_markup=keyboard)
         bot.register_next_step_handler(message, step1)
 
+@bot.callback_query_handler(func=lambda call: call.data == 'en' or call.data=='ru' or call.data=='cz' or call.data == 'it')
+def callback_function1(callback_obj: telebot.types.CallbackQuery):
+    global user_language
+    user_language = callback_obj.data
+    bot.delete_message(callback_obj.from_user.id, callback_obj.message.id)
+    bot.send_message(callback_obj.from_user.id, get_translation(user_language, 'start', filepath))
 
 @bot.callback_query_handler(func=lambda message: message == True)
 # _______________________________________________________________________
@@ -30,7 +56,7 @@ def step1(message):  # Name Parse
     global object_message
     object_message = message
     name = message.text
-    bot.send_message(message.from_user.id, 'В каком вузе учишься?')  # todo Варианты
+    bot.send_message(message.from_user.id, get_translation(user_language, 'university', filepath))
     bot.register_next_step_handler(message, step2)
 
 # ________________________________________________________________________
@@ -40,7 +66,7 @@ def step1(message):  # Name Parse
 def step2(message):  # Name Parse
     global university
     university = message.text
-    bot.send_message(message.from_user.id, 'С каким предметом тебе нужна помощь?')
+    bot.send_message(message.from_user.id, get_translation(user_language, 'subject', filepath))
     bot.register_next_step_handler(message, step3)
 
 
@@ -48,7 +74,7 @@ def step2(message):  # Name Parse
 def step3(message):  # Name Parse
     global subject
     subject = message.text
-    bot.send_message(message.from_user.id, 'Сформулируйте свой вопрос.')
+    bot.send_message(message.from_user.id, get_translation(user_language, 'purpose', filepath))
     bot.register_next_step_handler(message, step4)
 
 
@@ -57,30 +83,41 @@ def step4(message):
     global purpose
     global information
     global text_message_confirmed
+    global question
     purpose = message.text
-    bot.send_message(message.from_user.id, "Ваш запрос создан, Проверьте информацию еще раз.")
+
 
     keyboard = types.InlineKeyboardMarkup()  # наша клавиатура
     key_yes = types.InlineKeyboardButton(text='\U00002705', callback_data='yes')  # кнопка «Да»
     keyboard.add(key_yes)  # добавляем кнопку в клавиатуру
     key_no = types.InlineKeyboardButton(text='\U0000274C', callback_data='no')
     keyboard.add(key_no)
-    question = 'Тебя зовут '+name+' ты из ' + university + '.' + ' Твой вопрос '+purpose+' По '+subject+'?'
-    information = f"Имя:{name}\nУниверситет:{university}\nПредмет:{subject}\nВопрос:{purpose}"
-    bot.send_message(message.from_user.id, text=question, reply_markup=keyboard)
+    question = get_translation(user_language, 'information_template', filepath).format(
+                         name=name,
+                         subject=subject,
+                         university=university,
+                         purpose=purpose
+                     )
+    bot.send_message(message.from_user.id,
+                     text=get_translation(user_language, 'confirm_message_to_user', filepath).format(
+                         name=name,
+                         subject=subject,
+                         university=university,
+                         purpose=purpose
+                     ),
+                     reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == 'yes')
 def callback_function1(callback_obj: telebot.types.CallbackQuery):
     global text_message_confirmed
-    bot.send_message(callback_obj.from_user.id, f"Вы нажали на кнопку подтверждения\U0001F680. "
-                                                f"Ждите ответа от преподователя\U000023F3.")
+    bot.send_message(callback_obj.from_user.id, text=get_translation(user_language, 'confirm', filepath))
     global customer_id
     customer_id = callback_obj.from_user.id
     keyboard = telebot.types.InlineKeyboardMarkup()
     key_yes = types.InlineKeyboardButton(text='\U00002705', callback_data='confirm')
     keyboard.add(key_yes)
-    bot.send_message(chat_id, text=information, reply_markup=keyboard)
+    bot.send_message(chat_id, text=question, reply_markup=keyboard)
     text_message_confirmed = callback_obj.message.id
 
 
@@ -95,15 +132,10 @@ def callback_function1(callback_obj: telebot.types.CallbackQuery):
     key_yes = types.InlineKeyboardButton(text='Создать еще один запрос', callback_data='create_old_new')
     keyboard.add(key_yes)
     bot.send_message(customer_id,
-                     f"{callback_obj.message.html_text}\nВаш заказ был взят нашим специалистом\U0001F973\n"
-                     f"Контакт специалиста"
-                     f"\U0001F4F2 :@"
-                     f"{callback_obj.from_user.username}",
+                     text=f"{question}\n{get_translation(user_language, 'contact_teacher', filepath).format(teacher_id=callback_obj.from_user.username)}", # noqa
                      reply_markup=keyboard)
 
-    bot.send_message(chat_id, text=f"{callback_obj.message.html_text}\nДанный заказ был взят пользователем"
-                                   f"\U0001F60E\n @"
-                                   f"{callback_obj.from_user.username}")
+    bot.send_message(chat_id, text=f"{callback_obj.message.html_text}\n{ get_translation(user_language, 'booked_order', filepath).format(teacher_id=callback_obj.from_user.username) }")  # noqa
     bot.delete_message(chat_id, callback_obj.message.id)
 
 
