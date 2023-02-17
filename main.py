@@ -35,14 +35,15 @@ def get_text_messages(message):
         keyboard.add(key_en)  # добавляем кнопку в клавиатуру
         key_ru = types.InlineKeyboardButton(text='Russian', callback_data='ru')
         keyboard.add(key_ru)
-        key_ru = types.InlineKeyboardButton(text='Czech', callback_data='cz')
+        key_ru = types.InlineKeyboardButton(text='Czech', callback_data='cs')
         keyboard.add(key_ru)
         key_ru = types.InlineKeyboardButton(text='Italian', callback_data='it')
         keyboard.add(key_ru)
         bot.send_message(message.from_user.id, 'Choose a language', reply_markup=keyboard)
         bot.register_next_step_handler(message, step1)
 
-@bot.callback_query_handler(func=lambda call: call.data == 'en' or call.data=='ru' or call.data=='cz' or call.data == 'it')
+@bot.callback_query_handler(func=lambda call: call.data == 'en' or call.data=='ru' or call.data=='cs'
+                                              or call.data == 'it')
 def callback_function1(callback_obj: telebot.types.CallbackQuery):
     global user_language
     user_language = callback_obj.data
