@@ -57,6 +57,7 @@ def step1(message):  # Name Parse
     global object_message
     object_message = message
     name = message.text
+    bot.delete_message(message.chat.id, message.message_id)
     bot.send_message(message.from_user.id, get_translation(user_language, 'university', filepath))
     bot.register_next_step_handler(message, step2)
 
@@ -67,6 +68,7 @@ def step1(message):  # Name Parse
 def step2(message):  # Name Parse
     global university
     university = message.text
+    bot.delete_message(message.chat.id, message.message_id)
     bot.send_message(message.from_user.id, get_translation(user_language, 'subject', filepath))
     bot.register_next_step_handler(message, step3)
 
@@ -75,6 +77,7 @@ def step2(message):  # Name Parse
 def step3(message):  # Name Parse
     global subject
     subject = message.text
+    bot.delete_message(message.chat.id, message.message_id)
     bot.send_message(message.from_user.id, get_translation(user_language, 'purpose', filepath))
     bot.register_next_step_handler(message, step4)
 
@@ -86,7 +89,7 @@ def step4(message):
     global text_message_confirmed
     global question
     purpose = message.text
-
+    bot.delete_message(message.chat.id, message.message_id)
 
     keyboard = types.InlineKeyboardMarkup()  # наша клавиатура
     key_yes = types.InlineKeyboardButton(text='\U00002705', callback_data='yes')  # кнопка «Да»
@@ -112,6 +115,7 @@ def step4(message):
 @bot.callback_query_handler(func=lambda call: call.data == 'yes')
 def callback_function1(callback_obj: telebot.types.CallbackQuery):
     global text_message_confirmed
+    bot.delete_message(callback_obj.from_user.id, callback_obj.message.id)
     bot.send_message(callback_obj.from_user.id, text=get_translation(user_language, 'confirm', filepath))
     global customer_id
     customer_id = callback_obj.from_user.id
@@ -119,6 +123,8 @@ def callback_function1(callback_obj: telebot.types.CallbackQuery):
     key_yes = types.InlineKeyboardButton(text='\U00002705', callback_data='confirm')
     keyboard.add(key_yes)
     bot.send_message(chat_id, text=question, reply_markup=keyboard)
+    print(callback_obj)
+    # bot.pin_chat_message(chat_id, callback_obj.message.id)
     text_message_confirmed = callback_obj.message.id
 
 
