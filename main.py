@@ -3,9 +3,6 @@ import telebot
 import sqlite3
 from telebot import types
 
-
-
-tmp = None
 # Инициализация базы данных
 def init_db():
     conn = sqlite3.connect('bot_states.db')
@@ -22,11 +19,49 @@ def init_db():
         filepath TEXT DEFAULT 'languages.json'
     )
     ''')
+    # Создание новой таблицы для хранения временных данных
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS temp_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        student_id INTEGER
+    )
+    ''')
     conn.commit()
     conn.close()
 
-
 init_db()
+
+# ...
+
+# Добавление временной информации о студенте
+def add_temp_data(student_id):
+    conn = sqlite3.connect('bot_states.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO temp_data (student_id)
+    VALUES (?)
+    ''', (student_id,))
+    conn.commit()
+    conn.close()
+
+# Получение временной информации о студенте
+def get_temp_data():
+    conn = sqlite3.connect('bot_states.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM temp_data ORDER BY id DESC LIMIT 1')
+    row = cursor.fetchone()
+    conn.close()
+    if row is None:
+        return None
+    return row[1]
+
+# Удаление временной информации о студенте
+def delete_temp_data():
+    conn = sqlite3.connect('bot_states.db')
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM temp_data')
+    conn.commit()
+    conn.close()
 
 
 def get_user_state(user_id):
@@ -153,11 +188,13 @@ def step4(message):
 
 
 @bot.callback_query_handler(func=lambda call: call.data == 'yes')
-def callback_confirm(callback_obj: telebot.types.CallbackQuery):
-    update_user_state(callback_obj.from_user.id, text_message_confirmed=1)
-    bot.delete_message(callback_obj.from_user.id, callback_obj.message.id)
-    user_state = get_user_state(callback_obj.from_user.id)
-    bot.send_message(callback_obj.from_user.id, get_translation(user_state[1], 'confirm', user_state[7]))
+def callback_confirm_from_student(callback_obj: telebot.types.CallbackQuery):
+    user_id = callback_obj.from_user.id
+    update_user_state(user_id, text_message_confirmed=1)
+    add_temp_data(user_id)  # Добавляем user_id студента в temp_data
+    bot.delete_message(user_id, callback_obj.message.id)
+    user_state = get_user_state(user_id)
+    bot.send_message(user_id, get_translation(user_state[1], 'confirm', user_state[7]))
     buttons = [('\U00002705', 'confirm')]
     keyboard = create_keyboard(buttons)
     question = get_translation(user_state[1], 'information_template', user_state[7]).format(
@@ -169,28 +206,25 @@ def callback_confirm(callback_obj: telebot.types.CallbackQuery):
     bot.send_message(chat_id, text=question, reply_markup=keyboard)
 
 
-@bot.callback_query_handler(func=lambda call: call.data == 'no')
-def callback_deny(callback_obj: telebot.types.CallbackQuery):
-    bot.send_message(callback_obj.from_user.id, "Запустите бота снова./start")
-
-
 @bot.callback_query_handler(func=lambda call: call.data == 'confirm')
-def callback_final_confirm(callback_obj: telebot.types.CallbackQuery):
+def callback_final_confirm_from_teacher_contact(callback_obj: telebot.types.CallbackQuery):
     try:
-        user_state = get_user_state(callback_obj.from_user.id)
-        buttons = [(get_translation(user_state[1], 'new_order', user_state[7]), 'create_old_new')]
-        keyboard = create_keyboard(buttons)
+        student_id = get_temp_data()  # Получаем user_id студента из temp_data
+        delete_temp_data()  # Удаляем user_id студента из temp_data
+        if student_id is None:
+            raise Exception("No student ID found")
+        teacher_username = callback_obj.from_user.username
+        bot.send_message(student_id,
+                         text=f"Your request has been accepted by {teacher_username}")
         bot.send_message(callback_obj.from_user.id,
-                         text=f"{callback_obj.message.text}\n{get_translation(user_state[1], 'contact_teacher', user_state[7]).format(teacher_id=callback_obj.from_user.username)}",
-                         reply_markup=keyboard)
-        tmp = callback_obj.from_user.id
-        callback_obj.from_user.id = None
-        bot.send_message(chat_id,
-                         text=f"{callback_obj.message.html_text}\n{get_translation(user_state[1], 'booked_order', user_state[7]).format(teacher_id=callback_obj.from_user.username)}")
-        bot.delete_message(chat_id, callback_obj.message.id)
+                         text=f"You accepted the request from student with ID {student_id}")
     except Exception as e:
-        bot.send_message(tmp, text = f"FAILUER {e} Перезапустите бота")
-        pass
+        bot.send_message(callback_obj.from_user.id, text=f"FAILURE {e} Please restart the bot")
+
+
+@bot.callback_query_handler(func=lambda call: call.data == 'no')
+def callback_deny_from_student(callback_obj: telebot.types.CallbackQuery):
+    bot.send_message(callback_obj.from_user.id, "Запустите бота снова./start")
 
 
 @bot.callback_query_handler(func=lambda call: call.data == 'create_old_new')
