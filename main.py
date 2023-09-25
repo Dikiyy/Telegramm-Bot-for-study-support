@@ -209,18 +209,36 @@ def callback_confirm_from_student(callback_obj: telebot.types.CallbackQuery):
 @bot.callback_query_handler(func=lambda call: call.data == 'confirm')
 def callback_final_confirm_from_teacher_contact(callback_obj: telebot.types.CallbackQuery):
     try:
-        student_id = get_temp_data()  # Получаем user_id студента из temp_data
-        delete_temp_data()  # Удаляем user_id студента из temp_data
+        student_id = get_temp_data()
+        delete_temp_data()
         if student_id is None:
-            raise Exception("No student ID found")
-        teacher_username = callback_obj.from_user.username
-        bot.send_message(student_id,
-                         text=f"Your request has been accepted by {teacher_username}")
-        bot.send_message(callback_obj.from_user.id,
-                         text=f"You accepted the request from student with ID {student_id}")
-    except Exception as e:
-        bot.send_message(callback_obj.from_user.id, text=f"FAILURE {e} Please restart the bot")
+            raise Exception("No student data found")
 
+        student_state = get_user_state(student_id)
+
+        # обновляем сообщение, убирая кнопку и добавляя username преподавателя
+        new_text = f"{callback_obj.message.text}\nЗаказ принят пользователем: @{callback_obj.from_user.username}"
+        bot.edit_message_text(chat_id=callback_obj.message.chat.id,
+                              message_id=callback_obj.message.message_id,
+                              text=new_text)
+
+        # отправляем сообщение студенту и преподавателю как раньше
+        teacher_confirm = get_translation(student_state[1], 'confirm', student_state[7])
+        contact_teacher = get_translation(student_state[1], 'contact_teacher', student_state[7]).format(
+            teacher_id=callback_obj.from_user.username)
+
+        bot.send_message(student_id, text=f"{teacher_confirm}\n{contact_teacher}")
+
+        student_info = get_translation(student_state[1], 'information_template', student_state[7]).format(
+            name=student_state[2],
+            university=student_state[3],
+            subject=student_state[4],
+            purpose=student_state[5]
+        )
+        bot.send_message(callback_obj.from_user.id, text=student_info)
+
+    except Exception as e:
+        bot.send_message(callback_obj.from_user.id, text=f"FAILURE {e} Перезапустите бота")
 
 @bot.callback_query_handler(func=lambda call: call.data == 'no')
 def callback_deny_from_student(callback_obj: telebot.types.CallbackQuery):
