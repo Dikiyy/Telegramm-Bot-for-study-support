@@ -19,11 +19,11 @@
     },
     "ru": {
         "booked_order": "Этот заказ был взят:\n@{teacher_id} 📝",
-        "confirm": "Вы нажали на кнопку подтверждения 🚀. Ожидайте ответа от преподавателя ⏳.",
+        "confirm": "Вы нажали на кнопку подтверждения 🚀. Ожидайте учителя который примет ваш запрос. ⏳.",
         "confirm_message_to_user": "Итак, тебя зовут {name} \nТы учишь {subject} в {university}, и твой вопрос: \n{purpose} 🤔",
         "contact_teacher": "Связаться с преподавателем: @{teacher_id} 📞",
         "create_new_request": "Для создания нового запроса ⏭️...",
-        "information_template": "Имя:{name}\nУниверситет:{university}\nПредмет{subject}\nВопрос:\n{purpose}",
+        "information_template": "Имя:{name}\nУниверситет:{university}\nПредмет:{subject}\nВопрос:\n{purpose}",
         "new_order": "Создать новый заказ 🆕",
         "new_request_created": "Новый запрос создан. 🎉",
         "no": "\\U0000274C Нет",
@@ -34,24 +34,6 @@
         "subject": "Какой предмет вам нужен? 📚",
         "university": "В каком вы университете учитесь? 🏫",
         "yes": "\\U00002705 Да"
-    },
-    "it": {
-        "booked_order": "Questo ordine è stato preso:\n@{teacher_id} 📝",
-        "confirm": "Hai premuto il pulsante di conferma 🚀. Attendi la risposta dell'insegnante ⏳.",
-        "confirm_message_to_user": "Quindi il tuo nome è {name} \nStai studiando {subject} presso l'università di {university}, e la tua domanda è: \n{purpose} 🤔",
-        "contact_teacher": "Contatta l'insegnante: @{teacher_id} 📞",
-        "create_new_request": "Per creare una nuova richiesta ⏭️...",
-        "information_template": "Nome:{name}\nUniversità:{university}\nSoggetto:{subject}\nDomanda:\n{purpose}",
-        "new_order": "Crea nuovo ordine 🆕",
-        "new_request_created": "Nuova richiesta creata. 🎉",
-        "no": "\\U0000274C No",
-        "purpose": "Qual è lo scopo della tua richiesta? 🤔",
-        "request_confirmation": "Questa informazione è corretta? 🤔",
-        "request_created": "La tua richiesta è stata creata, controlla le informazioni ancora una volta: 📝",
-        "start": "Ciao! Come ti chiami? 😊",
-        "subject": "Di quale materia hai bisogno? 📚",
-        "university": "Di quale università stai studiando? 🏫",
-        "yes": "\\U00002705 Sì"
     },
     "cs": {
         "booked_order": "Tento požadavek byl přijat:\n@{teacher_id} 📝",
