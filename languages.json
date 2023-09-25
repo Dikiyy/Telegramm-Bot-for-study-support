@@ -23,7 +23,7 @@
         "confirm_message_to_user": "Итак, тебя зовут {name} \nТы учишь {subject} в {university}, и твой вопрос: \n{purpose} 🤔",
         "contact_teacher": "Связаться с преподавателем: @{teacher_id} 📞",
         "create_new_request": "Для создания нового запроса ⏭️...",
-        "information_template": "Имя:{name}\nУниверситет:{university}\nПредмет{subject}\nВопрос:\n{purpose}",
+        "information_template": "Имя:{name}\nУниверситет:{university}\nПредмет:{subject}\nВопрос:\n{purpose}",
         "new_order": "Создать новый заказ 🆕",
         "new_request_created": "Новый запрос создан. 🎉",
         "no": "\\U0000274C Нет",

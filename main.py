@@ -137,7 +137,7 @@ def create_keyboard(buttons):
     return keyboard
 
 
-@bot.callback_query_handler(func=lambda call: call.data in ['en', 'ru', 'cs', 'it'])
+@bot.callback_query_handler(func=lambda call: call.data in ['en', 'ru', 'cs'])
 def callback_function1(callback_obj: telebot.types.CallbackQuery):
     update_user_state(callback_obj.from_user.id, user_language=callback_obj.data)
     bot.delete_message(callback_obj.from_user.id, callback_obj.message.id)
@@ -222,27 +222,31 @@ def callback_final_confirm_from_teacher_contact(callback_obj: telebot.types.Call
                               message_id=callback_obj.message.message_id,
                               text=new_text)
 
-        # отправляем сообщение студенту и преподавателю как раньше
+        # получаем переводы
         teacher_confirm = get_translation(student_state[1], 'confirm', student_state[7])
         contact_teacher = get_translation(student_state[1], 'contact_teacher', student_state[7]).format(
             teacher_id=callback_obj.from_user.username)
 
-        bot.send_message(student_id, text=f"{teacher_confirm}\n{contact_teacher}")
-
+        # сообщение для студента
         student_info = get_translation(student_state[1], 'information_template', student_state[7]).format(
             name=student_state[2],
             university=student_state[3],
             subject=student_state[4],
             purpose=student_state[5]
         )
-        bot.send_message(callback_obj.from_user.id, text=student_info)
+
+        # сообщение для студента, объединяющее информацию о запросе и контакте учителя
+        student_message = f"{student_info}\n{contact_teacher}\n"
+
+        # отправляем сообщение студенту
+        bot.send_message(student_id, text=student_message)
 
     except Exception as e:
         bot.send_message(callback_obj.from_user.id, text=f"FAILURE {e} Перезапустите бота")
 
 @bot.callback_query_handler(func=lambda call: call.data == 'no')
 def callback_deny_from_student(callback_obj: telebot.types.CallbackQuery):
-    bot.send_message(callback_obj.from_user.id, "Запустите бота снова./start")
+    bot.send_message(callback_obj.from_user.id, "Restart./start")
 
 
 @bot.callback_query_handler(func=lambda call: call.data == 'create_old_new')
