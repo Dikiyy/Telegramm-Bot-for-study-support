@@ -1,5 +1,6 @@
 {
     "en": {
+        "order_accepted": "Student's contact:\n@{student_username}. 🎉",
         "booked_order": "This order has been taken:\n@{teacher_id} 📝",
         "confirm": "You have clicked the confirmation button 🚀. Please wait for a response from the teacher ⏳.",
         "confirm_message_to_user": "So, your name is {name}\nYou study {subject} at {university}, and your question is:\n{purpose} 🤔",
@@ -18,6 +19,7 @@
         "yes": "\\U00002705 Yes"
     },
     "ru": {
+        "order_accepted": "Ваш студент:\n@{student_username}. 🎉",
         "booked_order": "Этот заказ был взят:\n@{teacher_id} 📝",
         "confirm": "Вы нажали на кнопку подтверждения 🚀. Ожидайте учителя который примет ваш запрос. ⏳.",
         "confirm_message_to_user": "Итак, тебя зовут {name} \nТы учишь {subject} в {university}, и твой вопрос: \n{purpose} 🤔",
@@ -36,6 +38,7 @@
         "yes": "\\U00002705 Да"
     },
     "cs": {
+        "order_accepted": "Kontaktujte Studenta:\n@{student_username}. 🎉",
         "booked_order": "Tento požadavek byl přijat:\n@{teacher_id} 📝",
         "confirm": "Kliknutím na tlačítko Potvrdit 🚀 počkejte na odpověď učitele ⏳.",
         "confirm_message_to_user": "Takže, vaše jméno je {name}\nStudujete {subject} na {university} a vaše otázka je:\n{purpose} 🤔",

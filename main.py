@@ -215,7 +215,6 @@ def callback_confirm_from_student(callback_obj: telebot.types.CallbackQuery):
     bot.delete_message(user_id, callback_obj.message.id)
     user_state = get_user_state(user_id)
     bot.send_message(user_id, get_translation(user_state[1], 'confirm', user_state[7]))
-    bot.send_message(user_id, text="Создайте новый(Для теста) Overflow'ов и Callback'ов. \nБлагодарю Diar(C).\nClick /start")
     buttons = [('\U00002705', 'confirm')]
     keyboard = create_keyboard(buttons)
     question = get_translation(user_state[1], 'information_template', user_state[7]).format(
@@ -237,7 +236,10 @@ def callback_final_confirm_from_teacher_contact(callback_obj: telebot.types.Call
 
         student_state = get_user_state(student_id)
         student_username = student_state[8]
-        bot.send_message(callback_obj.from_user.id, text=f"Заказ создан студентом @{student_username}.")
+        accept_message = get_translation(student_state[1], 'order_accepted', "languages.json").format(
+            student_username=student_username)
+
+        bot.send_message(callback_obj.from_user.id, text=accept_message)
 
 
         # обновляем сообщение, убирая кнопку и добавляя username преподавателя
