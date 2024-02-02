@@ -123,7 +123,7 @@ def get_text_messages(message):
     user_state = get_user_state(message.from_user.id)
     if message.text == "/start":
         bot.send_message(message.from_user.id, "Starting...")
-        buttons = [('English', 'en'), ('Russian', 'ru'), ('Czech', 'cs'), ('Italian', 'it')]
+        buttons = [('English', 'en'), ('Russian', 'ru'), ('Czech', 'cs')]
         keyboard = create_keyboard(buttons)
         bot.send_message(message.from_user.id, 'Choose a language', reply_markup=keyboard)
         bot.register_next_step_handler(message, step1)
@@ -195,6 +195,7 @@ def callback_confirm_from_student(callback_obj: telebot.types.CallbackQuery):
     bot.delete_message(user_id, callback_obj.message.id)
     user_state = get_user_state(user_id)
     bot.send_message(user_id, get_translation(user_state[1], 'confirm', user_state[7]))
+    bot.send_message(user_id, text="Создайте новый(Для теста) Overflow'ов и Callback'ов. \nБлагодарю Diar(C).\nClick /start")
     buttons = [('\U00002705', 'confirm')]
     keyboard = create_keyboard(buttons)
     question = get_translation(user_state[1], 'information_template', user_state[7]).format(
