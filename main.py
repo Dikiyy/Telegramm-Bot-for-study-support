@@ -7,6 +7,7 @@ from telebot import types
 def init_db():
     conn = sqlite3.connect('bot_states.db')
     cursor = conn.cursor()
+    # Создание таблицы bot_states, если она еще не создана (код без изменений)
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS bot_states (
         user_id INTEGER PRIMARY KEY,
@@ -19,7 +20,13 @@ def init_db():
         filepath TEXT DEFAULT 'languages.json'
     )
     ''')
-    # Создание новой таблицы для хранения временных данных
+    # Попытка добавить колонку username, если она еще не существует
+    try:
+        cursor.execute('ALTER TABLE bot_states ADD COLUMN username TEXT')
+    except sqlite3.OperationalError:
+        # Если колонка уже существует, игнорируем ошибку
+        pass
+    # Создание таблицы temp_data, если она еще не создана (код без изменений)
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS temp_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,24 +71,26 @@ def delete_temp_data():
     conn.close()
 
 
-def get_user_state(user_id):
+def get_user_state(user_id, username=None):  # Добавлен параметр username с дефолтным значением None
     conn = sqlite3.connect('bot_states.db')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM bot_states WHERE user_id = ?', (user_id,))
     row = cursor.fetchone()
     conn.close()
     if row is None:
-        return create_new_user_state(user_id)
+        if username is None:  # Если username не предоставлен, используем дефолтное значение
+            username = 'unknown'
+        return create_new_user_state(user_id, username)  # Передаем username в функцию
     return row
 
 
-def create_new_user_state(user_id):
+def create_new_user_state(user_id, username):  # Добавляем аргумент username
     conn = sqlite3.connect('bot_states.db')
     cursor = conn.cursor()
     cursor.execute('''
-    INSERT INTO bot_states (user_id, user_language, name, university, subject, purpose, text_message_confirmed)
-    VALUES (?, '', '', '', '', '', 0)
-    ''', (user_id,))
+    INSERT INTO bot_states (user_id, username, user_language, name, university, subject, purpose, text_message_confirmed)
+    VALUES (?, ?, '', '', '', '', '', 0)
+    ''', (user_id, username))  # Добавляем username в запрос
     conn.commit()
     conn.close()
     return get_user_state(user_id)
@@ -118,15 +127,26 @@ chat_id = '-1001770638270'
 bot = telebot.TeleBot(bot_token)
 
 
+
 @bot.message_handler(content_types=['text', 'photo'])
 def get_text_messages(message):
-    user_state = get_user_state(message.from_user.id)
     if message.text == "/start":
+        user_id = message.from_user.id
+        username = message.from_user.username  # Получение username
+        # Проверка, существует ли уже состояние пользователя, и создание нового при необходимости
+        user_state = get_user_state(user_id, username)
+        if user_state is None:
+            create_new_user_state(user_id, username)  # Создание нового состояния пользователя с username
+        else:
+            update_user_state(user_id, username=username)  # Обновление состояния существующего пользователя с новым username, если он изменился
         bot.send_message(message.from_user.id, "Starting...")
-        buttons = [('English', 'en'), ('Russian', 'ru'), ('Czech', 'cs'), ('Italian', 'it')]
+        buttons = [('English', 'en'), ('Russian', 'ru'), ('Czech', 'cs')]
         keyboard = create_keyboard(buttons)
         bot.send_message(message.from_user.id, 'Choose a language', reply_markup=keyboard)
         bot.register_next_step_handler(message, step1)
+    else:
+        # Обработка других текстовых сообщений и фото
+        pass
 
 
 def create_keyboard(buttons):
@@ -215,6 +235,12 @@ def callback_final_confirm_from_teacher_contact(callback_obj: telebot.types.Call
             raise Exception("No student data found")
 
         student_state = get_user_state(student_id)
+        student_username = student_state[8]
+        accept_message = get_translation(student_state[1], 'order_accepted', "languages.json").format(
+            student_username=student_username)
+
+        bot.send_message(callback_obj.from_user.id, text=accept_message)
+
 
         # обновляем сообщение, убирая кнопку и добавляя username преподавателя
         new_text = f"{callback_obj.message.text}\nЗаказ принят пользователем: @{callback_obj.from_user.username}"
